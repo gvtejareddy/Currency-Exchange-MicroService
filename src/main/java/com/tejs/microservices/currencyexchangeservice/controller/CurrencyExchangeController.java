@@ -1,0 +1,33 @@
+package com.tejs.microservices.currencyexchangeservice.controller;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.tejs.microservices.currencyexchangeservice.DTO.CurrencyExchange;
+import com.tejs.microservices.currencyexchangeservice.repository.CurrencyExchangeRepository;
+
+@RestController
+public class CurrencyExchangeController {
+    
+    @Autowired
+    private Environment environment;
+
+    @Autowired
+    CurrencyExchangeRepository currencyExchangeRepository;
+
+    @GetMapping("/currency-exchange/from/{from}/to/{to}")
+    public CurrencyExchange getExchangeValue(@PathVariable String from , @PathVariable String to){
+        CurrencyExchange currencyExchange = currencyExchangeRepository.findByFromAndTo(from, to);
+        if(currencyExchange==null){
+            throw new RuntimeException("Unabale to find any data");
+        }
+        
+        currencyExchange.setEnvironment(environment.getProperty("local.server.port"));
+        return currencyExchange;
+    }
+
+}
